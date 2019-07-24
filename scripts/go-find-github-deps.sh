@@ -10,10 +10,11 @@ fi
 
 (
   # shellcheck disable=SC2086
-  find $* -name "Godeps*" -exec cat {} \; \
+  find $* -type 'f' -name "Godeps*" -exec cat {} \; \
     | grep -vE "^#" | awk '{ print $1 }' \
     | grep "github.com" \
-    | sed -E "s/.*(github.com[\/:][^/]+\/[^/]+)[/\"]?.*/\1/g"
+    | sed -E "s/.*(github.com[\/:][^/]+\/[^/]+)[/\"]?.*/\1/g" \
+    || echo ""
   # shellcheck disable=SC2086
   find $* -name "*.go" -exec cat {} \; \
     | grep -E "[\s\t]*\"github.com" \
