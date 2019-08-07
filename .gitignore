@@ -17,3 +17,6 @@
 
 # GO
 out/
+
+# MacOS
+.DS_Store
