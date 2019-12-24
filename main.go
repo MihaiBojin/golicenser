@@ -1,3 +1,20 @@
+/*
+ *    Copyright 2019 Mihai Bojin
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ *
+ */
+
 package main
 
 import (
@@ -16,21 +33,23 @@ import (
 	"encoding/base64"
 	"encoding/csv"
 
-	"github.com/google/go-github/v27/github"
+	"github.com/google/go-github/v28/github"
 	"golang.org/x/oauth2"
 )
+
+var version string
 
 // solution based on this resource: https://stackoverflow.com/a/52600147/7169815
 var reNewLineReplacer = regexp.MustCompile(`\r\n|[\r\n\v\f\x{0085}\x{2028}\x{2029}]`)
 
 // License represents license data for a single dependency
 type License struct {
-	Licenses string `json:"licenses"`
-	Repository string `json:"repository"`
-	Publisher string `json:"publisher"`
-	Name string `json:"name"`
-	Version string `json:"version"`
-	Copyright string `json:"copyright"`
+	Licenses    string `json:"licenses"`
+	Repository  string `json:"repository"`
+	Publisher   string `json:"publisher"`
+	Name        string `json:"name"`
+	Version     string `json:"version"`
+	Copyright   string `json:"copyright"`
 	LicenseText string `json:"licenseText"`
 	LicenseFile string `json:"licenseFile"`
 }
@@ -39,6 +58,7 @@ func main() {
 	// parse arguments
 	argsWithoutProg := os.Args[1:]
 	if len(argsWithoutProg) == 0 {
+		fmt.Printf("golicenser, version: %s\n", version)
 		fmt.Println("Usage: golicenser LICENSE-FILE [GITHUB-PERSONAL-TOKEN]")
 		fmt.Println()
 		os.Exit(0)
@@ -124,7 +144,7 @@ func main() {
 	// store the JSON report
 	jsonFile, jsonErr := json.MarshalIndent(deps, "", "  ")
 	fatalIfErr(jsonErr)
-	jsonWriteErr := ioutil.WriteFile(reportFilename + "-report.json", jsonFile, 0744)
+	jsonWriteErr := ioutil.WriteFile(reportFilename+"-report.json", jsonFile, 0744)
 	fatalIfErr(jsonWriteErr)
 
 	// finish exceptionally, if errors were detected
@@ -142,7 +162,6 @@ func GetAuthenticatedClient(token string) *http.Client {
 	)
 	return oauth2.NewClient(context.Background(), ts)
 }
-
 
 // GetGitHubLicense makes a best effort attempt to determine the project's github license
 func GetGitHubLicense(httpClient *http.Client, owner string, repository string) (license *github.RepositoryLicense, ok bool) {
@@ -186,7 +205,7 @@ func extractCopyrightNotices(licenseContents string) (string, bool) {
 		// remove leading/trailing spaces
 		l = strings.TrimSpace(l)
 
-		if !strings.Contains(l,"Copyright") {
+		if !strings.Contains(l, "Copyright") {
 			continue
 		}
 
