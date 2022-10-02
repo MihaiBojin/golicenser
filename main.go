@@ -33,7 +33,7 @@ import (
 	"encoding/base64"
 	"encoding/csv"
 
-	"github.com/google/go-github/v28/github"
+	"github.com/google/go-github/v41/github"
 	"golang.org/x/oauth2"
 )
 
